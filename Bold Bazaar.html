@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BOLD BAZAAR</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* ===== 1. COLORS (change these to re-theme the site) ===== */
+:root {
+  --bg: #ffe600;
+  --card: #ffffff;
+  --ink: #000000;
+  --pink: #ff4d8d;
+  --blue: #3b5bff;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #c9b800; }
+}
+:root[data-theme="dark"] { --bg: #c9b800; }
+
+/* ===== 2. BASIC STYLES ===== */
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Archivo', Arial, sans-serif;
+  font-weight: 500;
+  line-height: 1.5;
+}
+h1, h2, h3, .btn { font-family: 'Archivo Black', Impact, sans-serif; text-transform: uppercase; }
+.wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+
+/* ===== 3. HEADER ===== */
+header { background: var(--ink); color: var(--bg); border-bottom: 4px solid var(--ink); }
+header .wrap { display: flex; justify-content: space-between; align-items: center; padding-top: 14px; padding-bottom: 14px; }
+.logo { font-family: 'Archivo Black', Impact, sans-serif; font-size: 1.6rem; }
+.cart-btn { background: var(--pink); color: var(--ink); border: 3px solid var(--bg); padding: 8px 14px; cursor: pointer; font-family: 'Archivo Black', Impact, sans-serif; font-size: 1rem; }
+
+/* ===== 4. HERO ===== */
+.hero { padding: 48px 0 32px; }
+.hero h1 { font-size: clamp(2.6rem, 9vw, 6rem); line-height: 0.95; margin: 0 0 16px; }
+.hero p { font-size: 1.2rem; max-width: 520px; margin: 0; }
+
+/* ===== 5. FILTER BUTTONS ===== */
+.filters { display: flex; flex-wrap: wrap; gap: 10px; margin: 24px 0; }
+.btn { border: 3px solid var(--ink); background: var(--card); color: var(--ink); padding: 10px 16px; cursor: pointer; font-size: 0.95rem; box-shadow: 4px 4px 0 var(--ink); }
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--ink); }
+.btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--ink); }
+.btn:focus-visible, .cart-btn:focus-visible { outline: 4px solid var(--blue); outline-offset: 2px; }
+.btn.active { background: var(--blue); color: #fff; }
+
+/* ===== 6. PRODUCT GRID ===== */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 24px; padding-bottom: 56px; }
+.product { background: var(--card); border: 4px solid var(--ink); box-shadow: 8px 8px 0 var(--ink); display: flex; flex-direction: column; }
+.product .pic { font-size: 4.5rem; text-align: center; padding: 24px 0; border-bottom: 4px solid var(--ink); }
+.product .pic img { width: 100%; height: 200px; object-fit: cover; display: block; }
+.product .pic:has(img) { padding: 0; }
+.product .info { padding: 14px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.product h3 { margin: 0; font-size: 1.1rem; }
+.price { font-size: 1.4rem; font-family: 'Archivo Black', Impact, sans-serif; }
+.product .btn { margin-top: auto; background: var(--pink); }
+
+/* ===== 7. CART PANEL (slides in from right) ===== */
+.cart { position: fixed; top: 0; right: 0; height: 100%; width: min(400px, 100%); background: var(--card); border-left: 4px solid var(--ink); padding: 16px; transform: translateX(100%); transition: transform 0.2s; display: flex; flex-direction: column; z-index: 10; }
+.cart.open { transform: translateX(0); }
+.cart-head { display: flex; justify-content: space-between; align-items: center; }
+.cart-head h2 { margin: 0; }
+.items { flex: 1; overflow-y: auto; margin: 16px 0; }
+.item { border: 3px solid var(--ink); padding: 10px; margin-bottom: 12px; display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+.qty { display: flex; align-items: center; gap: 6px; }
+.qty button { border: 3px solid var(--ink); background: var(--bg); width: 32px; height: 32px; font-weight: 700; cursor: pointer; }
+.total { font-size: 1.5rem; font-family: 'Archivo Black', Impact, sans-serif; display: flex; justify-content: space-between; border-top: 4px solid var(--ink); padding-top: 12px; }
+.empty { font-weight: 700; }
+#msg { margin-top: 10px; font-weight: 700; min-height: 1.5em; }
+
+footer { background: var(--ink); color: var(--bg); padding: 20px 0; text-align: center; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header>
+  <div class="wrap">
+    <div class="logo">BOLD BAZAAR</div>
+    <button class="cart-btn" id="openCart">CART (<span id="count">0</span>)</button>
+  </div>
+</header>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="wrap">
+    <h1>Loud stuff.<br>Fair prices.</h1>
+    <p>Pick what you like, add it to your cart, and check out. No sign-up needed.</p>
+  </div>
+</section>
+
+<!-- ===== PRODUCTS ===== -->
+<main class="wrap">
+  <div class="filters" id="filters"></div>
+  <div class="grid" id="grid"></div>
+</main>
+
+<!-- ===== CART PANEL ===== -->
+<aside class="cart" id="cart" aria-label="Shopping cart">
+  <div class="cart-head">
+    <h2>Your cart</h2>
+    <button class="btn" id="closeCart">Close</button>
+  </div>
+  <div class="items" id="items"></div>
+  <div class="total"><span>Total</span><span id="total">₹0</span></div>
+  <button class="btn" id="checkout" style="margin-top:14px;background:var(--blue);color:#fff">Checkout</button>
+  <div id="msg" role="status"></div>
+</aside>
+
+<footer>Made with HTML, CSS and JS only.</footer>
+
+<script>
+/* ===== 1. PRODUCT DATA: add or edit products here =====
+   image: put a file path (images/sneakers.jpg) or a full https:// link.
+   If the image fails to load, the emoji icon shows instead. */
+const products = [
+  { id: 1, image: "images/sneakers.jpg", name: "Loud Sneakers",  price: 2499, category: "Shoes",       icon: "👟" },
+  { id: 2, image: "images/boots.jpg", name: "Chunky Boots",   price: 3299, category: "Shoes",       icon: "🥾" },
+  { id: 3, image: "images/tee.jpg", name: "Oversized Tee",  price: 799,  category: "Clothes",     icon: "👕" },
+  { id: 4, image: "images/hoodie.jpg", name: "Cargo Hoodie",   price: 1599, category: "Clothes",     icon: "🧥" },
+  { id: 5, image: "images/sunglasses.jpg", name: "Big Sunglasses", price: 599,  category: "Accessories", icon: "🕶️" },
+  { id: 6, image: "images/cap.jpg", name: "Street Cap",     price: 449,  category: "Accessories", icon: "🧢" },
+  { id: 7, image: "images/headphones.jpg", name: "Boom Headphones",price: 1899, category: "Accessories", icon: "🎧" },
+  { id: 8, image: "images/backpack.jpg", name: "Mini Backpack",  price: 1199, category: "Accessories", icon: "🎒" }
+];
+
+/* ===== 2. STATE: what the app remembers ===== */
+let cart = [];            // list of { id, qty }
+let activeCategory = "All";
+
+/* ===== 3. HELPERS ===== */
+const $ = (id) => document.getElementById(id);
+const money = (n) => "₹" + n.toLocaleString("en-IN");
+
+/* ===== 4. SHOW FILTER BUTTONS ===== */
+function renderFilters() {
+  const cats = ["All", ...new Set(products.map(p => p.category))];
+  $("filters").innerHTML = cats.map(c =>
+    `<button class="btn ${c === activeCategory ? "active" : ""}" data-cat="${c}">${c}</button>`
+  ).join("");
+}
+
+/* ===== 5. SHOW PRODUCTS ===== */
+function renderProducts() {
+  const list = activeCategory === "All" ? products : products.filter(p => p.category === activeCategory);
+  $("grid").innerHTML = list.map(p => `
+    <article class="product">
+      <div class="pic">${p.image ? `<img src="${p.image}" alt="${p.name}" onerror="this.replaceWith('${p.icon}')">` : p.icon}</div>
+      <div class="info">
+        <h3>${p.name}</h3>
+        <div class="price">${money(p.price)}</div>
+        <button class="btn" data-add="${p.id}">Add to cart</button>
+      </div>
+    </article>`).join("");
+}
+
+/* ===== 6. SHOW CART ===== */
+function renderCart() {
+  let total = 0, count = 0;
+  const html = cart.map(item => {
+    const p = products.find(x => x.id === item.id);
+    total += p.price * item.qty;
+    count += item.qty;
+    return `
+      <div class="item">
+        <div><strong>${p.icon} ${p.name}</strong><br>${money(p.price * item.qty)}</div>
+        <div class="qty">
+          <button data-minus="${p.id}" aria-label="Remove one">-</button>
+          <span>${item.qty}</span>
+          <button data-plus="${p.id}" aria-label="Add one">+</button>
+        </div>
+      </div>`;
+  }).join("");
+  $("items").innerHTML = html || `<p class="empty">Your cart is empty. Add something from the store.</p>`;
+  $("total").textContent = money(total);
+  $("count").textContent = count;
+}
+
+/* ===== 7. CART ACTIONS ===== */
+function addToCart(id) {
+  const found = cart.find(i => i.id === id);
+  if (found) found.qty++;
+  else cart.push({ id, qty: 1 });
+  renderCart();
+  $("cart").classList.add("open");
+}
+function changeQty(id, change) {
+  const item = cart.find(i => i.id === id);
+  item.qty += change;
+  if (item.qty <= 0) cart = cart.filter(i => i.id !== id);   // remove when 0
+  renderCart();
+}
+
+/* ===== 8. CLICK EVENTS ===== */
+document.addEventListener("click", (e) => {
+  const t = e.target;
+  if (t.dataset.cat)   { activeCategory = t.dataset.cat; renderFilters(); renderProducts(); }
+  if (t.dataset.add)   addToCart(Number(t.dataset.add));
+  if (t.dataset.plus)  changeQty(Number(t.dataset.plus), 1);
+  if (t.dataset.minus) changeQty(Number(t.dataset.minus), -1);
+});
+$("openCart").onclick  = () => $("cart").classList.add("open");
+$("closeCart").onclick = () => $("cart").classList.remove("open");
+$("checkout").onclick  = () => {
+  if (cart.length === 0) { $("msg").textContent = "Add at least one item first."; return; }
+  cart = [];
+  renderCart();
+  $("msg").textContent = "Order placed! (This is a demo, no real payment.)";
+};
+
+/* ===== 9. START ===== */
+renderFilters();
+renderProducts();
+renderCart();
+</script>
+</body>
+</html>
